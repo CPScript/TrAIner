@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrAIner - Efficient AI Training Platform</title>
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #16213e;
+            --accent-color: #0f3460;
+            --accent-light: #4361ee;
+            --accent-hover: #536dfe;
+            --text-color: #e7e7e7;
+            --text-muted: #a2a2a2;
+            --dark-bg: #0f0f1a;
+            --card-bg: #1f1f3a;
+            --code-bg: #151528;
+            --code-color: #f8f8f2;
+            --border-color: #2a294e;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --header-height: 60px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 8px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--dark-bg);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        a {
+            text-decoration: none;
+            color: var(--accent-light);
+            transition: var(--transition);
+        }
+        
+        .container {
+            display: flex;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background-color: var(--primary-color);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-logo span {
+            background: linear-gradient(135deg, var(--accent-light), #7b68ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-left: 6px;
+        }
+        
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .header-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .header-button i {
+            font-size: 1rem;
+        }
+        
+        /* Navigation */
+        nav {
+            width: 280px;
+            background-color: var(--primary-color);
+            position: fixed;
+            height: calc(100vh - var(--header-height));
+            top: var(--header-height);
+            left: 0;
+            overflow-y: auto;
+            padding: 24px 0;
+            box-shadow: var(--shadow-md);
+            z-index: 900;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--primary-color);
+        }
+        
+        nav::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        nav::-webkit-scrollbar-track {
+            background: var(--primary-color);
+        }
+        
+        nav::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: 20px;
+        }
+        
+        nav ul {
+            list-style: none;
+            padding: 0 16px;
+        }
+        
+        nav .nav-section {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            margin-bottom: 8px;
+            padding-left: 16px;
+            font-weight: 600;
+        }
+        
+        nav .nav-section:first-child {
+            margin-top: 0;
+        }
+        
+        nav .nav-item {
+            margin-bottom: 2px;
+        }
+        
+        nav .nav-link {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        
+        nav .nav-link:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        nav .nav-link.active {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        nav .nav-subsection {
+            padding-left: 16px;
+        }
+        
+        nav .nav-subsection .nav-link {
+            font-size: 0.9rem;
+            padding: 6px 16px;
+        }
+        
+        /* Dropdown Menus */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-toggle {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .dropdown-toggle::after {
+            content: '▼';
+            font-size: 0.6rem;
+            margin-left: 8px;
+            transition: var(--transition);
+        }
+        
+        .dropdown.open .dropdown-toggle::after {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .dropdown.open .dropdown-menu {
+            max-height: 1000px; /* Arbitrary large value */
+            transition: max-height 0.5s ease-in;
+        }
+        
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 40px;
+            margin-left: 280px;
+            margin-top: var(--header-height);
+            max-width: 1000px;
+        }
+        
+        /* Section Styles */
+        .section {
+            margin-bottom: 60px;
+            animation: fadeIn 0.5s ease-out;
+            display: none; /* Hide all sections by default */
+        }
+        
+        .section.active {
+            display: block; /* Show only active section */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .section-header:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--accent-light), var(--accent-hover));
+            border-radius: 3px;
+        }
+        
+        .section-header h1 {
+            margin-bottom: 16px;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #fff, var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--text-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            line-height: 1.3;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 2.5rem;
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            margin-top: 2rem;
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+        
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+        
+        /* Copy Button for Code Blocks */
+        .code-header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 8px 16px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .copy-button {
+            background-color: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .copy-button:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 24px 0;
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tbody tr {
+            background-color: var(--card-bg);
+            transition: var(--transition);
+        }
+        
+        tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-light);
+        }
+        
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        
+        /* Lists */
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 24px;
+        }
+        
+        ul li, ol li {
+            margin-bottom: 8px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            margin-right: 12px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        /* Alerts */
+        .alert {
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            margin: 24px 0;
+            position: relative;
+            border-left: 5px solid transparent;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .alert-warning {
+            border-color: var(--warning-color);
+        }
+        
+        .alert-danger {
+            border-color: var(--danger-color);
+        }
+        
+        .alert-info {
+            border-color: var(--accent-light);
+        }
+        
+        .alert-success {
+            border-color: var(--success-color);
+        }
+        
+        /* Tags */
+        .tag {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+        
+        .tag:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* Syntax Highlighting (simplified) */
+        .highlight .keyword { color: #ff79c6; }
+        .highlight .string { color: #f1fa8c; }
+        .highlight .comment { color: #6272a4; }
+        .highlight .function { color: #50fa7b; }
+        .highlight .number { color: #bd93f9; }
+        .highlight .operator { color: #ff79c6; }
+        .highlight .class { color: #8be9fd; }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            main {
+                padding: 30px;
+                max-width: 100%;
+            }
+        }
+        
+        
+        @media (max-width: 768px) {
+            nav {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 260px;
+            }
+            
+            nav.open {
+                transform: translateX(0);
+            }
+            
+            main {
+                margin-left: 0;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+        }
+        
+        /* Mobile Menu Toggle */
+        .nav-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 16px;
+            display: none;
+        }
+        
+        /* Utilities */
+        .mt-0 { margin-top: 0 !important; }
+        .mb-0 { margin-bottom: 0 !important; }
+        .text-center { text-align: center; }
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-2 { gap: 8px; }
+        .gap-4 { gap: 16px; }
+        
+        /* Code highlighting */
+        .code-comment { color: #6272a4; }
+        .code-keyword { color: #ff79c6; font-weight: bold; }
+        .code-string { color: #f1fa8c; }
+        .code-number { color: #bd93f9; }
+        .code-function { color: #50fa7b; }
+        .code-type { color: #8be9fd; }
+        .code-operator { color: #ff79c6; }
+        .code-variable { color: #f8f8f2; }
+        .code-punctuation { color: #f8f8f2; }
+        
+        /* Transitions and Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .dark-mode-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        /* Icons (using Unicode symbols for simplicity) */
+        .icon-menu::before { content: '☰'; }
+        .icon-download::before { content: '⬇'; }
+        .icon-github::before { content: '⚙'; }
+        .icon-moon::before { content: '☾'; }
+        .icon-sun::before { content: '☀'; }
+        .icon-code::before { content: '</>'; }
+        .icon-copy::before { content: '📋'; }
+        
+        /* Progress bar animation for code examples */
+        .progress-bar {
+            height: 3px;
+            background: linear-gradient(to right, var(--accent-light), var(--accent-hover));
+            width: 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            animation: progress 6s ease-out;
+        }
+        
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        /* Interactive examples */
+        .interactive-demo {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin: 24px 0;
+        }
+        
+        .demo-header {
+            background-color: var(--secondary-color);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .demo-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .demo-content {
+            padding: 16px;
+            background-color: var(--card-bg);
+        }
+        
+        .demo-output {
+            padding: 16px;
+            background-color: var(--code-bg);
+            border-top: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            min-height: 60px;
+        }
+
+        /* Coming Soon Banner */
+        .coming-soon {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .coming-soon h2 {
+            border-bottom: none;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        
+        .coming-soon p {
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+            <span class="icon-menu"></span>
+        </button>
+        <div class="header-logo">
+            Tr<span>AIner</span>
+        </div>
+        <div class="header-actions">
+            <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                <span class="icon-moon"></span>
+            </button>
+            <button class="header-button">
+                <span class="icon-download"></span> Download
+            </button>
+            <button class="header-button">
+                <span class="icon-github"></span> GitHub
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav id="nav">
+            <ul>
+                <li class="nav-section">Getting Started</li>
+                <li class="nav-item">
+                    <a href="#overview" class="nav-link" data-section="overview">Introduction</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#features" class="nav-link" data-section="features">Key Features</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#installation" class="nav-link" data-section="installation">Installation</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#quickstart" class="nav-link" data-section="quickstart">Quickstart Guide</a>
+                </li>
+                
+                <li class="nav-section">Core Components</li>
+                <li class="nav-item">
+                    <a href="#model-architecture" class="nav-link" data-section="model-architecture">Model Architecture</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#training-procedures" class="nav-link" data-section="training-procedures">Training Procedures</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#inference" class="nav-link" data-section="inference">Inference</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#data-processing" class="nav-link" data-section="data-processing">Data Processing</a>
+                </li>
+                
+                <li class="nav-section">Advanced Features</li>
+                <li class="nav-item">
+                    <a href="#moe" class="nav-link" data-section="moe">Mixture of Experts</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#distributed-training" class="nav-link" data-section="distributed-training">Distributed Training</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#quantization" class="nav-link" data-section="quantization">Quantization</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#speculative-decode" class="nav-link" data-section="speculative-decode">Speculative Decoding</a>
+                </li>
+                
+                <li class="nav-section">Usage Examples</li>
+                <li class="nav-item">
+                    <a href="#text-generation" class="nav-link" data-section="text-generation">Text Generation</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#fine-tuning" class="nav-link" data-section="fine-tuning">Fine-tuning</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#jsonl-format" class="nav-link" data-section="jsonl-format">JSONL Format</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#cli-usage" class="nav-link" data-section="cli-usage">CLI Usage</a>
+                </li>
+                
+                <li class="nav-section">API Reference</li>
+                <li class="nav-item">
+                    <a href="#model-api" class="nav-link" data-section="model-api">Model API</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#tokenizer-api" class="nav-link" data-section="tokenizer-api">Tokenizer API</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#training-api" class="nav-link" data-section="training-api">Training API</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#dataset-api" class="nav-link" data-section="dataset-api">Dataset API</a>
+                </li>
+                
+                <li class="nav-section">Performance</li>
+                <li class="nav-item">
+                    <a href="#benchmarks" class="nav-link" data-section="benchmarks">Benchmarks</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#optimization" class="nav-link" data-section="optimization">Optimization</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#hardware-reqs" class="nav-link" data-section="hardware-reqs">Hardware Requirements</a>
+                </li>
+                
+                <li class="nav-section">Additional Resources</li>
+                <li class="nav-item">
+                    <a href="#faq" class="nav-link" data-section="faq">FAQ</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#troubleshooting" class="nav-link" data-section="troubleshooting">Troubleshooting</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#community" class="nav-link" data-section="community">Community</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#roadmap" class="nav-link" data-section="roadmap">Roadmap</a>
+                </li>
+            </ul>
+        </nav>
+        
+        <main>
+            <section id="overview" class="section active">
+                <div class="section-header">
+                    <h1>TrAIner</h1>
+                    <p class="subtitle">Efficiently train and run inference on transformer models with your personal computer</p>
+                </div>
+                
+                <div class="card">
+                    <p>TrAIner is a lightweight yet powerful platform designed to democratize AI model training by enabling efficient transformer model training on consumer-grade hardware. With advanced memory optimization techniques and a focus on performance, TrAIner makes it possible to build, train, and deploy sophisticated language models without requiring enterprise-level infrastructure.</p>
+                
+                    <p>Whether you're a researcher, developer, or AI enthusiast, TrAIner provides the tools you need to experiment with state-of-the-art model architectures while maintaining complete control over your training pipeline and data.</p>
+                </div>
+                
+                <div class="btn-group">
+                    <a href="#quickstart" class="btn btn-primary nav-btn" data-section="quickstart">Get Started</a>
+                    <a href="#features" class="btn nav-btn" data-section="features">View Features</a>
+                </div>
+                
+                <div class="interactive-demo">
+                    <div class="demo-header">
+                        <div class="demo-title">Interactive Example</div>
+                        <button class="btn btn-secondary">Run</button>
+                    </div>
+                    <div class="demo-content">
+                        <pre><code class="highlight"><span class="code-keyword">import</span> torch
+<span class="code-keyword">from</span> modeling <span class="code-keyword">import</span> ChatModel, ChatConfig, ChatTokenizer
+
+<span class="code-comment"># Load model and tokenizer</span>
+model_path = <span class="code-string">"./model/trained_model"</span>
+model, tokenizer, device = load_model_and_tokenizer(model_path)
+
+<span class="code-comment"># Generate text</span>
+response = chat(<span class="code-string">"Explain the concept of neural networks"</span>, 
+               model, tokenizer, device, 
+               max_new_tokens=512,
+               temperature=0.7)</code></pre>
+                    </div>
+                    <div class="demo-output">
+Neural networks are computational models inspired by the human brain's structure and function. They consist of interconnected nodes or "neurons" organized in layers. Each connection between neurons has a weight that adjusts as the network learns from data.
+
+The basic structure includes an input layer, one or more hidden layers, and an output layer. Data flows through the network, with each neuron applying a transformation function to its inputs before passing the result to the next layer.
+
+Neural networks learn by adjusting their weights through a process called backpropagation, minimizing the difference between predicted outputs and actual values. This ability to learn from examples makes them powerful for tasks like image recognition, natural language processing, and complex decision-making problems.
+                    </div>
+                </div>
+            </section>
+            
+            <section id="features" class="section">
+                <h2>Key Features</h2>
+                
+                <div class="card">
+                    <h3>Efficient Training on Consumer Hardware</h3>
+                    <p>TrAIner is specifically optimized to run on consumer-grade hardware, making AI model development accessible to everyone. Through advanced memory optimization techniques, gradient accumulation, and mixed precision training, you can train sophisticated models on standard GPUs.</p>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="tag">Memory Optimization</div>
+                        <div class="tag">Mixed Precision</div>
+                        <div class="tag">Gradient Accumulation</div>
+                        <div class="tag">Checkpointing</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Advanced Model Architecture</h3>
+                    <p>TrAIner implements state-of-the-art transformer architectures with performance-enhancing features such as Mixture of Experts, Grouped Query Attention, and more. These advanced techniques allow for larger, more capable models that can still run on limited hardware.</p>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="tag">Transformer Layers</div>
+                        <div class="tag">Mixture of Experts</div>
+                        <div class="tag">Grouped Query Attention</div>
+                        <div class="tag">RMSNorm</div>
+                        <div class="tag">Rotary Embeddings</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Fast Inference</h3>
+                    <p>TrAIner includes highly optimized inference capabilities with support for advanced techniques like speculative decoding, KV-caching, and quantization. This enables responsive, real-time AI interactions even on modest hardware.</p>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="tag">Speculative Decoding</div>
+                        <div class="tag">KV Caching</div>
+                        <div class="tag">8-bit Quantization</div>
+                        <div class="tag">Batched Generation</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Flexible Data Handling</h3>
+                    <p>Train models on a variety of data formats with minimal preprocessing. TrAIner supports both raw text files and structured JSONL formats, with built-in tokenization and data augmentation capabilities.</p>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <div class="tag">Text Format</div>
+                        <div class="tag">JSONL Format</div>
+                        <div class="tag">Custom Tokenizers</div>
+                        <div class="tag">Dialogue Format</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="installation" class="section">
+                <h2>Installation and Setup</h2>
+                
+                <div id="requirements" class="subsection">
+                    <h3>System Requirements</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Minimum</th>
+                                <th>Recommended</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CPU</td>
+                                <td>4 cores</td>
+                                <td>8+ cores</td>
+                            </tr>
+                            <tr>
+                                <td>RAM</td>
+                                <td>8GB</td>
+                                <td>16GB+</td>
+                            </tr>
+                            <tr>
+                                <td>GPU</td>
+                                <td>4GB VRAM (CUDA compatible)</td>
+                                <td>8GB+ VRAM</td>
+                            </tr>
+                            <tr>
+                                <td>Storage</td>
+                                <td>10GB free space</td>
+                                <td>50GB+ free space</td>
+                            </tr>
+                            <tr>
+                                <td>OS</td>
+                                <td>Windows 10, Ubuntu 20.04, macOS 10.15</td>
+                                <td>Latest versions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="setup" class="subsection">
+                    <h3>Installation Guide</h3>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># Clone the repository</span>
+git clone https://github.com/CPScript/TrAIner.git
+cd TrAIner
+
+<span class="code-comment"># Install dependencies</span>
+pip install torch safetensors tqdm numpy
+
+<span class="code-comment"># For CUDA support (adjust based on your CUDA version)</span>
+pip install torch --extra-index-url https://download.pytorch.org/whl/cu118
+
+<span class="code-comment"># Verify installation</span>
+python -c "import torch; print(f'PyTorch version: {torch.__version__}, CUDA available: {torch.cuda.is_available()}')"</code></pre>
+                </div>
+                
+                <div id="configuration" class="subsection">
+                    <h3>Configuration</h3>
+                    <p>TrAIner can be configured through command-line arguments or a configuration file. Here's a sample configuration file showing key parameters:</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># config.json</span>
+{
+  <span class="code-string">"model"</span>: {
+    <span class="code-string">"hidden_size"</span>: 768,
+    <span class="code-string">"num_layers"</span>: 12,
+    <span class="code-string">"num_heads"</span>: 12,
+    <span class="code-string">"num_kv_heads"</span>: 4,
+    <span class="code-string">"feed_forward_dim"</span>: 3072,
+    <span class="code-string">"max_seq_length"</span>: 2048,
+    <span class="code-string">"dropout"</span>: 0.1,
+    <span class="code-string">"use_moe"</span>: true,
+    <span class="code-string">"num_experts"</span>: 8,
+    <span class="code-string">"use_rotary"</span>: true,
+    <span class="code-string">"use_rmsnorm"</span>: true
+  },
+  <span class="code-string">"training"</span>: {
+    <span class="code-string">"data_path"</span>: <span class="code-string">"./data/dialogues.txt"</span>,
+    <span class="code-string">"data_format"</span>: <span class="code-string">"txt"</span>,
+    <span class="code-string">"output_dir"</span>: <span class="code-string">"./model"</span>,
+    <span class="code-string">"batch_size"</span>: 4,
+    <span class="code-string">"epochs"</span>: 30,
+    <span class="code-string">"learning_rate"</span>: 5e-5,
+    <span class="code-string">"weight_decay"</span>: 0.01,
+    <span class="code-string">"warmup_steps"</span>: 1000,
+    <span class="code-string">"fp16"</span>: true
+  }
+}</code></pre>
+                </div>
+            </section>
+            
+            <section id="quickstart" class="section">
+                <h2>Quickstart Guide</h2>
+                
+                <div class="alert alert-info">
+                    <strong>Note:</strong> This quickstart guide assumes you have already installed TrAIner and its dependencies as described in the Installation section.
+                </div>
+                
+                <h3>Training Your First Model</h3>
+                <div class="code-header">
+                    <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                </div>
+                <pre><code class="highlight"><span class="code-comment"># Create a sample training data file</span>
+mkdir -p data
+cat > data/dialogues.txt << EOF
+<|user|>What is artificial intelligence?<|assistant|>Artificial intelligence refers to systems or machines that can perform tasks that typically require human intelligence. This includes learning from examples and experience, recognizing objects, understanding and responding to language, making decisions, and solving problems.<|end|>
+<|user|>Explain neural networks<|assistant|>Neural networks are computing systems inspired by the biological neural networks in animal brains. They consist of artificial neurons that can learn from and make decisions based on input data. Deep learning, a subset of machine learning, uses multiple layers of these neural networks to progressively extract higher-level features from raw input.<|end|>
+EOF
+
+<span class="code-comment"># Train a model with default parameters</span>
+python train.py --data_path ./data/dialogues.txt --epochs 3 --batch_size 2
+
+<span class="code-comment"># The model will be saved in the ./model directory</span></code></pre>
+                
+                <h3>Running Inference</h3>
+                <div class="code-header">
+                    <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                </div>
+                <pre><code class="highlight"><span class="code-comment"># Start the interactive chat interface</span>
+python chat.py --model_path ./model/final
+
+<span class="code-comment"># You can now chat with your trained model</span>
+> Tell me about machine learning
+> exit  # Type 'exit' to quit</code></pre>
+                
+                <h3>Non-Interactive Generation</h3>
+                <div class="code-header">
+                    <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                </div>
+                <pre><code class="highlight"><span class="code-comment"># Generate a response for a specific input</span>
+python chat.py --model_path ./model/final --input "What are transformer models?" --no_interactive</code></pre>
+
+                <h3>Customizing Model Architecture</h3>
+                <div class="code-header">
+                    <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                </div>
+                <pre><code class="highlight"><span class="code-comment"># Train with a customized model architecture</span>
+python train.py \
+  --data_path ./data/dialogues.txt \
+  --hidden_size 512 \
+  --num_layers 8 \
+  --num_heads 8 \
+  --feed_forward_dim 2048 \
+  --use_moe \
+  --num_experts 4 \
+  --batch_size 2 \
+  --epochs 5</code></pre>
+            </section>
+            
+            <section id="model-architecture" class="section">
+                <h2>Model Architecture</h2>
+                
+                <p>TrAIner implements a modern transformer-based architecture with several advanced features:</p>
+                
+                <div class="interactive-demo">
+                    <div class="demo-header">
+                        <div class="demo-title">Model Architecture Diagram</div>
+                    </div>
+                    <div class="demo-content" style="text-align: center;">
+                        <pre style="text-align: left; display: inline-block;">
++--------------------------------+
+|         Input Embedding        |
++--------------------------------+
+              |
+              v
++--------------------------------+
+|     Positional Encoding        |
++--------------------------------+
+              |
+              v
++--------------------------------+
+|  Transformer Layer 1           |
+|  +--------------------------+  |
+|  |  Self-Attention          |  |
+|  |  (GQA + RoPE)            |  |
+|  +--------------------------+  |
+|              |                 |
+|              v                 |
+|  +--------------------------+  |
+|  |  Mixture of Experts      |  |
+|  |  Feed Forward Network    |  |
+|  +--------------------------+  |
++--------------------------------+
+              |
+              v
++--------------------------------+
+|  Transformer Layer 2...N       |
++--------------------------------+
+              |
+              v
++--------------------------------+
+|     Layer Normalization        |
++--------------------------------+
+              |
+              v
++--------------------------------+
+|     Language Model Head        |
++--------------------------------+
+</pre>
+                    </div>
+                </div>
+
+                <h3>Core Components</h3>
+                
+                <div class="card">
+                    <h3>Self-Attention Mechanism</h3>
+                    <p>TrAIner implements an advanced attention mechanism with support for both traditional multi-head attention and Grouped Query Attention (GQA). GQA reduces computation and memory requirements by sharing key-value heads across query heads.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-keyword">class</span> <span class="code-type">MultiHeadAttention</span>(nn.Module):
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, config):
+        <span class="code-keyword">super</span>().<span class="code-function">__init__</span>()
+        self.config = config
+        self.hidden_size = config.hidden_size
+        self.num_heads = config.num_heads
+        self.num_kv_heads = config.num_kv_heads <span class="code-keyword">if</span> config.use_gqa <span class="code-keyword">else</span> config.num_heads
+        self.head_dim = config.hidden_size // config.num_heads
+        
+        <span class="code-comment"># For GQA, we have different numbers of q and kv heads</span>
+        self.kv_repeats = self.num_heads // self.num_kv_heads <span class="code-keyword">if</span> config.use_gqa <span class="code-keyword">else</span> 1
+        
+        <span class="code-comment"># Q, K, V projections</span>
+        self.q_proj = nn.Linear(self.hidden_size, self.num_heads * self.head_dim, bias=config.attention_bias)
+        self.k_proj = nn.Linear(self.hidden_size, self.num_kv_heads * self.head_dim, bias=config.attention_bias)
+        self.v_proj = nn.Linear(self.hidden_size, self.num_kv_heads * self.head_dim, bias=config.attention_bias)
+        self.out_proj = nn.Linear(self.num_heads * self.head_dim, self.hidden_size, bias=config.attention_bias)</code></pre>
+                </div>
+                
+                <div class="card">
+                    <h3>Mixture of Experts (MoE)</h3>
+                    <p>MoE enables larger, more capable models by conditionally activating only a subset of model parameters for each input token. This provides increased model capacity without a proportional increase in computation.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-keyword">class</span> <span class="code-type">MoEFeedForward</span>(nn.Module):
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self, config):
+        <span class="code-keyword">super</span>().<span class="code-function">__init__</span>()
+        self.experts = nn.ModuleList([
+            GEGLU(
+                config.hidden_size, 
+                config.feed_forward_dim, 
+                bias=True
+            ) <span class="code-keyword">for</span> _ <span class="code-keyword">in</span> range(config.num_experts)
+        ])
+        self.gate = nn.Linear(config.hidden_size, config.num_experts)
+        self.dropout = nn.Dropout(config.dropout)
+        self.num_experts = config.num_experts
+        self.expert_capacity = 2  <span class="code-comment"># Number of tokens per expert</span></code></pre>
+                </div>
+            </section>
+            
+            <section id="training-procedures" class="section">
+                <h2>Training Procedures</h2>
+                
+                <p>TrAIner provides comprehensive training capabilities with support for various optimizations:</p>
+                
+                <div class="card">
+                    <h3>Mixed Precision Training</h3>
+                    <p>Dramatically reduce memory usage and speed up training with minimal impact on model quality by using lower precision formats (FP16 or BF16) for calculation while maintaining FP32 precision for weights.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># Enable mixed precision training with FP16</span>
+python train.py --data_path ./data/dialogues.txt --fp16
+
+<span class="code-comment"># Use BF16 for better numerical stability on supported hardware</span>
+python train.py --data_path ./data/dialogues.txt --optimized_bf16</code></pre>
+                </div>
+                
+                <div class="card">
+                    <h3>Gradient Accumulation</h3>
+                    <p>Train with larger effective batch sizes on limited hardware by accumulating gradients across multiple forward/backward passes before updating weights.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># Use gradient accumulation for larger effective batch size</span>
+python train.py --data_path ./data/dialogues.txt --batch_size 2 --gradient_accumulation_steps 8
+<span class="code-comment"># Effective batch size: 2 * 8 = 16</span></code></pre>
+                </div>
+            </section>
+            
+            <section id="inference" class="section">
+                <h2>Inference</h2>
+                
+                <p>TrAIner provides efficient inference capabilities with several optimization techniques:</p>
+                
+                <div class="card">
+                    <h3>Speculative Decoding</h3>
+                    <p>This advanced technique uses a smaller "draft" model to predict multiple tokens at once, which are then verified by the main model. This can significantly speed up generation by 2-3x with minimal impact on quality.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># Enable speculative decoding</span>
+python chat.py --model_path ./model/final --use_speculative --spec_len 5
+
+<span class="code-comment"># Use a separate draft model</span>
+python chat.py --model_path ./model/final --use_speculative --draft_model ./model/smaller</code></pre>
+                </div>
+                
+                <div class="card">
+                    <h3>KV Caching</h3>
+                    <p>TrAIner automatically caches key-value pairs during generation, avoiding redundant computation and significantly speeding up the inference process.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Quantization</h3>
+                    <p>For memory-constrained environments, TrAIner supports 8-bit quantization that can reduce memory requirements by up to 4x with minimal quality degradation.</p>
+                    
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><span class="code-comment"># Enable 8-bit quantization for inference</span>
+python chat.py --model_path ./model/final --quantize</code></pre>
+                </div>
+            </section>
+            
+            <section id="data-processing" class="section">
+                <h2>Data Processing</h2>
+                
+                <p>TrAIner supports flexible data formats and processing pipelines:</p>
+                
+                <div class="card">
+                    <h3>Supported Data Formats</h3>
+                    
+                    <h4>Text Format</h4>
+                    <p>Simple text files with conversation markers:</p>
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight"><|user|>What is machine learning?<|assistant|>Machine learning is a branch of artificial intelligence that focuses on developing systems that can learn from and make decisions based on data. Instead of being explicitly programmed to perform a task, these systems learn from experience.<|end|>
+<|user|>How does deep learning differ from machine learning?<|assistant|>Deep learning is a subset of machine learning that uses neural networks with many layers (hence "deep"). While traditional machine learning requires feature extraction by humans, deep learning automatically discovers the representations needed for feature detection or classification from raw data. It's particularly powerful for complex tasks like image and speech recognition.<|end|></code></pre>
+                    
+                    <h4>JSONL Format</h4>
+                    <p>Structured JSON Lines format for more complex conversations:</p>
+                    <div class="code-header">
+                        <button class="copy-button"><span class="icon-copy"></span> Copy</button>
+                    </div>
+                    <pre><code class="highlight">{"messages": [{"role": "user", "content": "Explain the concept of transformer models."}, {"role": "assistant", "content": "Transformer models are a type of neural network architecture introduced in the paper 'Attention Is All You Need' by Vaswani et al. They rely primarily on self-attention mechanisms rather than recurrence or convolution, allowing them to process input sequences in parallel rather than sequentially. This parallelization enables more efficient training on large datasets. The architecture typically consists of an encoder and decoder, each made up of attention layers and feed-forward neural networks. Transformers have become the foundation for many state-of-the-art language models like GPT, BERT, and T5."}]}
+{"messages": [{"role": "system", "content": "You are a helpful AI assistant."}, {"role": "user", "content": "What are the limitations of current AI systems?"}, {"role": "assistant", "thinking": "I should cover limitations like data quality dependence, lack of common sense, explainability issues, and resource requirements.", "content": "Current AI systems face several important limitations: 1) They're highly dependent on training data quality and can perpetuate biases present in that data. 2) They lack true understanding or common sense reasoning. 3) Many modern AI systems, especially deep learning ones, function as 'black boxes' with limited explainability. 4) They typically require significant computational resources and energy to train. 5) They struggle with transferring knowledge between different tasks (though transfer learning helps). 6) They're vulnerable to adversarial attacks and can be fooled by carefully crafted inputs."}]}</code></pre>
+                </div>
+            </section>
+            
+            <section id="moe" class="section">
+                <h2>Mixture of Experts</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>In-depth documentation about Mixture of Experts architecture implementation in TrAIner</p>
+                </div>
+                
+                <p>The Mixture of Experts (MoE) module in TrAIner enables training models with significantly increased parameter count while maintaining reasonable computational requirements. MoE works by activating only a subset of the model's parameters for each input token, which enables models to scale to billions of parameters even on consumer hardware.</p>
+                
+                <p>This section will include detailed explanations of:</p>
+                <ul>
+                    <li>How MoE architecture works in transformer models</li>
+                    <li>TrAIner's implementation of routing algorithms</li>
+                    <li>Expert capacity and load balancing techniques</li>
+                    <li>Performance benchmarks comparing standard vs MoE models</li>
+                    <li>Step-by-step guide to configuring and training MoE models</li>
+                    <li>Advanced tuning parameters and best practices</li>
+                </ul>
+            </section>
+            
+            <section id="distributed-training" class="section">
+                <h2>Distributed Training</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive guide to distributed training with TrAIner across multiple GPUs and machines</p>
+                </div>
+                
+                <p>TrAIner supports distributed training across multiple GPUs and even multiple machines, allowing you to scale up your training for faster completion or to accommodate larger models. This is implemented using PyTorch's DistributedDataParallel (DDP) framework.</p>
+                
+                <p>This section will cover:</p>
+                <ul>
+                    <li>Setting up multi-GPU training on a single machine</li>
+                    <li>Configuring distributed training across multiple machines</li>
+                    <li>Scaling strategies and performance optimizations</li>
+                    <li>Handling checkpoints and model saving in distributed environments</li>
+                    <li>Common issues and troubleshooting tips</li>
+                    <li>Advanced configurations for different network topologies</li>
+                </ul>
+            </section>
+            
+            <section id="quantization" class="section">
+                <h2>Quantization</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed guide to model quantization for improved inference performance</p>
+                </div>
+                
+                <p>Quantization is a technique that reduces the precision of model weights from 32-bit floating point (FP32) to lower precision formats like 8-bit integers (INT8). This can significantly reduce memory usage and improve inference speed with minimal impact on generation quality.</p>
+                
+                <p>This section will include:</p>
+                <ul>
+                    <li>Post-training quantization techniques supported in TrAIner</li>
+                    <li>Quantization-aware training for better results</li>
+                    <li>Performance benchmarks comparing FP32, FP16, and INT8 models</li>
+                    <li>Effects of quantization on different model components</li>
+                    <li>Advanced calibration techniques to minimize accuracy loss</li>
+                    <li>Hardware-specific optimizations for quantized models</li>
+                </ul>
+            </section>
+            
+            <section id="speculative-decode" class="section">
+                <h2>Speculative Decoding</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Advanced technique documentation for faster text generation using speculative methods</p>
+                </div>
+                
+                <p>Speculative decoding is an advanced technique that significantly speeds up text generation by using a smaller "draft" model to predict multiple tokens at once, which are then verified by the main model. This can provide a 2-3x speedup in generation while maintaining output quality.</p>
+                
+                <p>This section will cover:</p>
+                <ul>
+                    <li>Theoretical foundation of speculative decoding</li>
+                    <li>Implementation details in TrAIner</li>
+                    <li>Creating and training effective draft models</li>
+                    <li>Performance benchmarks and quality comparisons</li>
+                    <li>Tuning parameters to optimize the speed/quality tradeoff</li>
+                    <li>Advanced techniques like tree-based speculation</li>
+                </ul>
+            </section>
+            
+            <section id="text-generation" class="section">
+                <h2>Text Generation</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive guide to generating text with TrAIner models</p>
+                </div>
+                
+                <p>TrAIner provides flexible text generation capabilities with various options to control the output style, creativity, and generation speed. This section will detail how to use the generation API for different use cases.</p>
+                
+                <p>Topics to be covered include:</p>
+                <ul>
+                    <li>Interactive chat interface usage</li>
+                    <li>Programmatic text generation with the API</li>
+                    <li>Controlling parameters like temperature, top-p, and top-k</li>
+                    <li>Streaming generation for real-time applications</li>
+                    <li>Advanced sampling techniques and their effects</li>
+                    <li>Best practices for prompt engineering</li>
+                </ul>
+            </section>
+            
+            <section id="fine-tuning" class="section">
+                <h2>Fine-tuning</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed guide to fine-tuning existing models on your custom datasets</p>
+                </div>
+                
+                <p>Fine-tuning allows you to take a pre-trained model and adapt it to specific domains or tasks by training on your own datasets. This often achieves better results than training from scratch, especially for specialized applications.</p>
+                
+                <p>This section will provide detailed information on:</p>
+                <ul>
+                    <li>Preparing your dataset for fine-tuning</li>
+                    <li>Selecting appropriate hyperparameters</li>
+                    <li>Techniques to prevent catastrophic forgetting</li>
+                    <li>Parameter-efficient fine-tuning methods</li>
+                    <li>Evaluating fine-tuned model performance</li>
+                    <li>Advanced fine-tuning for specific applications</li>
+                </ul>
+            </section>
+            
+            <section id="jsonl-format" class="section">
+                <h2>JSONL Format</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed specification and examples for using JSONL formatted training data</p>
+                </div>
+                
+                <p>TrAIner supports structured JSONL (JSON Lines) format for training data, which provides more flexibility than plain text formats. This allows for more complex conversation structures, metadata, and special formatting.</p>
+                
+                <p>This section will include:</p>
+                <ul>
+                    <li>JSONL format specification for TrAIner</li>
+                    <li>Examples of various conversation patterns</li>
+                    <li>Supporting system prompts and multi-turn conversations</li>
+                    <li>Including metadata and auxiliary information</li>
+                    <li>Tools for converting between formats</li>
+                    <li>Performance considerations for large datasets</li>
+                </ul>
+            </section>
+            
+            <section id="cli-usage" class="section">
+                <h2>CLI Usage</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Complete reference for command-line interface options and parameters</p>
+                </div>
+                
+                <p>TrAIner provides a comprehensive command-line interface for training, inference, and model management. This section will serve as a complete reference for all available options.</p>
+                
+                <p>Topics to be covered include:</p>
+                <ul>
+                    <li>Complete listing of all CLI commands and parameters</li>
+                    <li>Train command options and syntax</li>
+                    <li>Chat command options for inference</li>
+                    <li>Model conversion and export utilities</li>
+                    <li>Data processing command-line tools</li>
+                    <li>Automation and scripting examples</li>
+                </ul>
+            </section>
+
+            <section id="model-api" class="section">
+                <h2>Model API</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive documentation of the Model API for developers</p>
+                </div>
+                
+                <p>The Model API provides programmatic access to TrAIner's model architecture, allowing developers to integrate, extend, and customize models for their specific needs.</p>
+                
+                <p>This section will include:</p>
+                <ul>
+                    <li>ChatModel class API reference</li>
+                    <li>ChatConfig options and parameter details</li>
+                    <li>Methods for loading and saving models</li>
+                    <li>Generation API and parameter explanations</li>
+                    <li>Forward pass customization options</li>
+                    <li>Extending the model with custom layers</li>
+                </ul>
+            </section>
+            
+            <section id="tokenizer-api" class="section">
+                <h2>Tokenizer API</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed documentation of the tokenization system and API</p>
+                </div>
+                
+                <p>The Tokenizer API handles the conversion between text and token IDs that the model can process. TrAIner includes a custom tokenizer designed to efficiently handle multiple languages and special tokens.</p>
+                
+                <p>This documentation will cover:</p>
+                <ul>
+                    <li>ChatTokenizer class API reference</li>
+                    <li>Building and managing custom vocabularies</li>
+                    <li>Adding special tokens and handling</li>
+                    <li>Tokenization patterns and regular expressions</li>
+                    <li>Encoding and decoding methods</li>
+                    <li>Performance optimization techniques</li>
+                </ul>
+            </section>
+            
+            <section id="training-api" class="section">
+                <h2>Training API</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive reference for the training and optimization API</p>
+                </div>
+                
+                <p>The Training API provides programmatic access to TrAIner's training pipeline, allowing developers to customize the training process, integrate custom datasets, and implement advanced training techniques.</p>
+                
+                <p>This section will include:</p>
+                <ul>
+                    <li>Training loop implementation details</li>
+                    <li>Optimizer and scheduler configuration</li>
+                    <li>Gradient accumulation and checkpointing</li>
+                    <li>Mixed precision training API</li>
+                    <li>Distributed training setup</li>
+                    <li>Custom training callbacks and hooks</li>
+                </ul>
+            </section>
+            
+            <section id="dataset-api" class="section">
+                <h2>Dataset API</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed documentation for dataset handling and processing</p>
+                </div>
+                
+                <p>The Dataset API handles loading, processing, and batching training data for efficient model training. This includes support for various data formats, preprocessing techniques, and data augmentation.</p>
+                
+                <p>This documentation will cover:</p>
+                <ul>
+                    <li>ChatDataset and JsonlChatDataset class references</li>
+                    <li>Creating custom dataset implementations</li>
+                    <li>Efficient data loading and preprocessing</li>
+                    <li>Data augmentation techniques</li>
+                    <li>Handling large datasets efficiently</li>
+                    <li>Implementing custom collation functions</li>
+                </ul>
+            </section>
+            
+            <section id="benchmarks" class="section">
+                <h2>Performance Benchmarks</h2>
+                
+                <div class="card">
+                    <h3>Training Performance</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model Size</th>
+                                <th>Hardware</th>
+                                <th>Batch Size</th>
+                                <th>Tokens/Second</th>
+                                <th>Memory Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TrAIner-Nano (14M)</td>
+                                <td>GTX 1660 (6GB)</td>
+                                <td>32</td>
+                                <td>35,000</td>
+                                <td>2.1 GB</td>
+                            </tr>
+                            <tr>
+                                <td>TrAIner-Micro (42M)</td>
+                                <td>GTX 1660 (6GB)</td>
+                                <td>16</td>
+                                <td>22,000</td>
+                                <td>3.8 GB</td>
+                            </tr>
+                            <tr>
+                                <td>TrAIner-Mini (125M)</td>
+                                <td>RTX 3060 (12GB)</td>
+                                <td>8</td>
+                                <td>12,000</td>
+                                <td>5.2 GB</td>
+                            </tr>
+                            <tr>
+                                <td>TrAIner-Small (350M)</td>
+                                <td>RTX 3080 (10GB)</td>
+                                <td>4</td>
+                                <td>5,800</td>
+                                <td>8.4 GB</td>
+                            </tr>
+                            <tr>
+                                <td>TrAIner-Base (1.3B)</td>
+                                <td>RTX 4090 (24GB)</td>
+                                <td>2</td>
+                                <td>2,200</td>
+                                <td>14.6 GB</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="optimization" class="section">
+                <h2>Optimization</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Detailed guide to optimizing model performance for both training and inference</p>
+                </div>
+                
+                <p>This section will provide comprehensive information about performance optimization techniques for both training and inference. It will help you maximize the efficiency of TrAIner on your hardware.</p>
+                
+                <p>Topics to be covered include:</p>
+                <ul>
+                    <li>Memory optimization techniques</li>
+                    <li>Computational efficiency improvements</li>
+                    <li>Hardware-specific optimizations</li>
+                    <li>Speed/quality tradeoffs and how to balance them</li>
+                    <li>Advanced profiling and bottleneck identification</li>
+                    <li>Case studies and benchmark analysis</li>
+                </ul>
+            </section>
+            
+            <section id="hardware-reqs" class="section">
+                <h2>Hardware Requirements</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive hardware specifications for different model sizes and use cases</p>
+                </div>
+                
+                <p>This section will provide detailed hardware recommendations for different model sizes and use cases, helping you plan your hardware requirements based on your specific goals.</p>
+                
+                <p>Information will include:</p>
+                <ul>
+                    <li>Detailed GPU recommendations by model size</li>
+                    <li>RAM and CPU requirements</li>
+                    <li>Storage considerations for datasets and checkpoints</li>
+                    <li>Cost-effective hardware configurations</li>
+                    <li>Cloud computing options and cost analysis</li>
+                    <li>Future hardware roadmap considerations</li>
+                </ul>
+            </section>
+            
+            <section id="faq" class="section">
+                <h2>Frequently Asked Questions</h2>
+                
+                <div class="card">
+                    <h3>General Questions</h3>
+                    
+                    <h4>What makes TrAIner different from other AI frameworks?</h4>
+                    <p>TrAIner is specifically designed for efficient AI model training on consumer hardware. Unlike many frameworks that require enterprise-grade GPUs, TrAIner implements advanced memory optimization techniques, includes Mixture of Experts architecture, and provides speculative decoding - all optimized to run on standard consumer GPUs.</p>
+                    
+                    <h4>Can I train models with my own data?</h4>
+                    <p>Yes! TrAIner is designed to be used with your own data. You can provide training data in simple text format or structured JSONL format. The system will automatically tokenize and process your data for training.</p>
+                    
+                    <h4>What hardware do I need?</h4>
+                    <p>TrAIner works on a wide range of hardware. For minimal setups, you can run smaller models on CPUs or GPUs with at least 4GB VRAM. For optimal performance, a GPU with 8GB+ VRAM (like RTX 3060 or better) is recommended. The system automatically adapts to your available hardware.</p>
+                </div>
+            </section>
+            
+            <section id="troubleshooting" class="section">
+                <h2>Troubleshooting</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Comprehensive troubleshooting guide for common issues and their solutions</p>
+                </div>
+                
+                <p>This section will provide step-by-step guidance for diagnosing and resolving common issues you might encounter when using TrAIner.</p>
+                
+                <p>Topics to be covered include:</p>
+                <ul>
+                    <li>Common installation issues and solutions</li>
+                    <li>CUDA compatibility problems</li>
+                    <li>Memory errors during training</li>
+                    <li>Slow training or inference performance</li>
+                    <li>Model quality issues and fine-tuning problems</li>
+                    <li>Data formatting and preprocessing errors</li>
+                </ul>
+            </section>
+            
+            <section id="community" class="section">
+                <h2>Community</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Information about joining the TrAIner community and contributing to the project</p>
+                </div>
+                
+                <p>TrAIner has a growing community of researchers, developers, and enthusiasts. This section will provide information about how to connect with others, contribute to the project, and share your work.</p>
+                
+                <p>This section will include:</p>
+                <ul>
+                    <li>Discord server and discussion forums</li>
+                    <li>Contributing guidelines for developers</li>
+                    <li>Model sharing platform and community models</li>
+                    <li>Research papers and publications</li>
+                    <li>Community showcase of TrAIner applications</li>
+                    <li>Tutorials and community resources</li>
+                </ul>
+            </section>
+            
+            <section id="roadmap" class="section">
+                <h2>Roadmap</h2>
+                
+                <div class="coming-soon">
+                    <h2>Coming Soon</h2>
+                    <p>Development roadmap and future plans for TrAIner</p>
+                </div>
+                
+                <p>This section will outline the planned development roadmap for TrAIner, including upcoming features, improvements, and research directions.</p>
+                
+                <p>Future plans include:</p>
+                <ul>
+                    <li>Support for multi-modal models (text + images)</li>
+                    <li>Advanced LoRA and QLoRA fine-tuning support</li>
+                    <li>Improved quantization techniques for even better efficiency</li>
+                    <li>Web-based training and inference interface</li>
+                    <li>Mobile deployment options</li>
+                    <li>Pre-trained model collection and repository</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section');
+            
+            function activateSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    
+                    window.location.hash = sectionId;
+                    
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('data-section') === sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                    
+                    window.scrollTo(0, 0);
+                }
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    activateSection(sectionId);
+                });
+            });
+            
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    activateSection(sectionId);
+                });
+            });
+            
+            if (window.location.hash) {
+                const sectionId = window.location.hash.substring(1);
+                activateSection(sectionId);
+            }
+            
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.classList.toggle('open');
+                });
+            });
+            
+            const navToggle = document.querySelector('.nav-toggle');
+            const nav = document.getElementById('nav');
+            if (navToggle) {
+                navToggle.addEventListener('click', function() {
+                    nav.classList.toggle('open');
+                });
+            }
+            
+            const copyButtons = document.querySelectorAll('.copy-button');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.closest('.code-header').nextElementSibling;
+                    const code = codeBlock.textContent;
+                    
+                    navigator.clipboard.writeText(code).then(() => {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<span class="icon-copy"></span> Copied!';
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                        }, 2000);
+                    });
+                });
+            });
+            
+            const darkModeToggle = document.querySelector('.dark-mode-toggle');
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('light-mode');
+                    const icon = this.querySelector('span');
+                    if (icon.classList.contains('icon-moon')) {
+                        icon.classList.remove('icon-moon');
+                        icon.classList.add('icon-sun');
+                    } else {
+                        icon.classList.remove('icon-sun');
+                        icon.classList.add('icon-moon');
+                    }
+                });
+            }
+
+            const runButtons = document.querySelectorAll('.demo-header .btn-secondary');
+            runButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const demoContainer = this.closest('.interactive-demo');
+                    const outputElement = demoContainer.querySelector('.demo-output');
+                    
+                    const originalOutput = outputElement.innerHTML;
+                    outputElement.innerHTML = 'Running...';
+                    
+                    setTimeout(() => {
+                        outputElement.innerHTML = originalOutput;
+                    }, 1000);
+                });
+            });
+            
+            const headerButtons = document.querySelectorAll('.header-button');
+            headerButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.textContent.includes('GitHub')) {
+                        window.open('https://github.com/CPScript/TrAIner', '_blank');
+                    } else if (this.textContent.includes('Download')) {
+                        window.open('https://github.com/CPScript/TrAIner/releases/latest', '_blank');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
